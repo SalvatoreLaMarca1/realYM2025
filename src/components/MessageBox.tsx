@@ -29,7 +29,7 @@ function MessageBox() {
 
 function incrementStatements() {
     index++
-    if(index >= messagesObjects.length) index = statements.length-1
+    if(index >= messagesObjects.length) index = messagesObjects.length-1
     setMessage()
 }
 
@@ -40,13 +40,13 @@ function decrementStatements() {
 }
 
 function setMessage() {
+    console.log(index)
+    console.log(messagesObjects.length)
+
     message = document.getElementById("statementArea");
     if(message)
         message.innerHTML = messagesObjects[index].message
 
-    console.log(message);
-
-    console.log(messagesObjects[index].message)
 }
 
 interface message {
