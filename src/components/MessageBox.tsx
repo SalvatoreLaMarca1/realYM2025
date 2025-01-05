@@ -5,7 +5,6 @@ import { db } from './firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore'
 
 let index = 0;
-let statements:string[] = ["Number zero test", "Number one test", "number two test", "Three Test bro"];
 let message = document.getElementById("statementArea")
 
 function MessageBox() {
