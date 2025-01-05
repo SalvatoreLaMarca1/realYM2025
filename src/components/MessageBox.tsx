@@ -4,8 +4,14 @@
 import { db } from './firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore'
 
+let index = 0;
+let statements:string[] = ["Number zero test", "Number one test", "number two test", "Three Test bro"];
+let message = document.getElementById("statementArea")
+
 function MessageBox() {
-    getFirebase()
+
+    fetchDocuments()
+
   return (
     <div>
         <div className="message-box">
@@ -19,9 +25,7 @@ function MessageBox() {
   )
 }
 
-let index = 0;
-let statements:string[] = ["Number zero test", "Number one test", "number two test", "Three Test bro"];
-let message = document.getElementById("statementArea")
+
 
 function incrementStatements() {
     index++
@@ -36,8 +40,11 @@ function decrementStatements() {
 }
 
 function setMessage() {
+    message = document.getElementById("statementArea");
     if(message)
         message.innerHTML = messagesObjects[index].message
+
+    console.log(message);
 
     console.log(messagesObjects[index].message)
 }
@@ -52,7 +59,7 @@ let messagesObjects: message[] = []
 
 
 
-function getFirebase() {
+// function getFirebase() {
 
     const fetchDocuments = async () => {
         const snapshot = await getDocs(collection(db, "statements"))
@@ -71,7 +78,7 @@ function getFirebase() {
         console.log(messagesObjects)
     }
     
-    fetchDocuments()
-}
+    
+// }
 
 export default MessageBox
