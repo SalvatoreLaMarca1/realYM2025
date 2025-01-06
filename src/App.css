@@ -71,6 +71,20 @@ h1 {
   border-radius: 15px;
 }
 
+h3 {
+  color:black;
+}
+
 p {
   color: black;
+}
+
+button {
+  background-color: pink;
+  color: black;
+}
+
+button:hover {
+  color: white;
+  border-color: purple;
 }
