@@ -6,12 +6,13 @@ import { db } from './firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore'
 
 let index = 0;
-let message = document.getElementById("statementArea")
+let messageText = document.getElementById("statementArea")
 let date = document.getElementById("date")
 
 function MessageBox() {
     useEffect(() => {
         fetchDocuments()
+        checkButtons()
     }, [])
 
   return (
@@ -28,10 +29,26 @@ function MessageBox() {
   )
 }
 
-// check what the date is 
+// on load go to the highest day that is not greater than the current day
+function setFirstDay() {
+    while(!checkDate()) {
+        index++;
+    }
+    index--;
+    console.log(index)
+    setMessage()
+    checkButtons()
+}
+
+// check what the date is -- return true if the date is ahead of current day
 function checkDate() {
     let todayDate = new Date();
     console.log(todayDate.toDateString())
+
+    if(messageDates[index] >= new Date())
+        return true
+
+    return false
 }
 
 // actions on buttons
@@ -39,22 +56,19 @@ function checkButtons() {
     const backButton = document.getElementById("backButton") as HTMLButtonElement
     const nextButton = document.getElementById("nextButton") as HTMLButtonElement
 
-    if(messageDates[index] > new Date()) {
-        console.log("This date is in the future")
-        console.log(messageDates[index])
-        console.log(new Date())
+    console.log(messageDates[index])
+    console.log(messageDates[index] > new Date())
+
+    if(checkDate()) {
+        nextButton.disabled = true
+        nextButton.style.backgroundColor = "grey"
+        return
     }
 
     if(index <= 0) {
-        backButton.disabled = true
-        backButton.style.backgroundColor = "grey"
-        nextButton.disabled = false
-        nextButton.style.backgroundColor = "pink"
-    } else if (index >= messagesObjects.length-1) {
-        nextButton.disabled = true 
-        nextButton.style.backgroundColor = "grey"
-        backButton.disabled = false
-        backButton.style.backgroundColor = "pink"
+        changeColors(nextButton, backButton)
+    } else if (index >= messagesObjects.length-1 ) {
+        changeColors(backButton, nextButton)
     } 
     else {
         backButton.disabled = false
@@ -62,6 +76,13 @@ function checkButtons() {
         backButton.style.backgroundColor = "pink"
         nextButton.style.backgroundColor = "pink"
     }
+}
+
+function changeColors(onButton:HTMLButtonElement, offButton:HTMLButtonElement) {
+    offButton.disabled = true
+    offButton.style.backgroundColor = "grey"
+    onButton.disabled = false
+    onButton.style.backgroundColor = "pink"
 }
 
 
@@ -87,15 +108,28 @@ function decrementStatements() {
 }
 
 function setMessage() {
-    message = document.getElementById("statementArea");
-    if(message)
-        message.innerHTML = messagesObjects[index].message
 
+    messageText = document.getElementById("statementArea");
     date = document.getElementById("date");
+
+
+    console.log(checkDate())
+
+    if(checkDate()) {
+        if(messageText)
+            messageText.innerHTML = "You have to wait for tomorrow"
+
+        if(date) 
+            date.innerHTML = "Till Next Time"
+        return
+    }
+    
+    if(messageText)
+        messageText.innerHTML = messagesObjects[index].message
+
     if(date) 
         date.innerHTML = messagesObjects[index].date
 
-    checkDate()
 }
 
 interface message {
@@ -110,8 +144,6 @@ let messageDates: Date[] = []
 let fetchInProgress = false;
 
 
-// function getFirebase() {
-
     const fetchDocuments = async () => {
         console.log("Fetching documents...")
 
@@ -122,7 +154,7 @@ let fetchInProgress = false;
         messagesObjects = []
         messageDates = []
 
-        const snapshot = await getDocs(collection(db, "statements"))
+        const snapshot = await getDocs(collection(db, "test-collection")) // using test collection rn --> switch to statements for production
         snapshot.forEach((doc) => {
             const data = doc.data()
 
@@ -140,9 +172,11 @@ let fetchInProgress = false;
             messagesObjects.push(messageObject)
             messageDates.push(data.date.toDate())
         })
+
+        console.log(messagesObjects)
         
         // set the <p> to the first day here because it will run only once --> or should...
-        setMessage()
+        setFirstDay()
     }
     
     
