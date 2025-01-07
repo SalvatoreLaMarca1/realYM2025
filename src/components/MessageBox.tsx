@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './MessageBox.css';
 import { db } from './firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
