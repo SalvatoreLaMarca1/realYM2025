@@ -5,3 +5,15 @@
     display: flex;
 
 }
+
+.button-disabled {
+    background-color: grey;
+    color: white;
+    cursor: not-allowed;
+}
+
+.button-enabled {
+    background-color: pink;
+    color: black;
+    cursor: pointer;
+}

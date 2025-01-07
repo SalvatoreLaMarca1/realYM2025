@@ -1,185 +1,131 @@
 
+import React, { useEffect, useState, useRef } from 'react';
+import './MessageBox.css';
+import { db } from './firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
- import { useEffect } from 'react';
-import './MessageBox.css'
-import { db } from './firebaseConfig'
-import { collection, getDocs } from 'firebase/firestore'
-
-let index = 0;
-let messageText = document.getElementById("statementArea")
-let date = document.getElementById("date")
-
-function MessageBox() {
-    useEffect(() => {
-        fetchDocuments()
-        checkButtons()
-    }, [])
-
-  return (
-    <div>
-        <div className="message-box">
-            <h3 id='date'></h3>
-            <p id='statementArea'></p>
-        </div>
-        <div className="holdButtons">
-            <button id="backButton" onClick={decrementStatements}>Past Day</button>
-            <button id="nextButton" onClick={incrementStatements}>Next Day</button>
-        </div>
-    </div>
-  )
-}
-
-// on load go to the highest day that is not greater than the current day
-function setFirstDay() {
-    while(!checkDate()) {
-        index++;
-    }
-    index--;
-    console.log(index)
-    setMessage()
-    checkButtons()
-}
-
-// check what the date is -- return true if the date is ahead of current day
-function checkDate() {
-    let todayDate = new Date();
-    console.log(todayDate.toDateString())
-
-    if(messageDates[index] >= new Date())
-        return true
-
-    return false
-}
-
-// actions on buttons
-function checkButtons() {
-    const backButton = document.getElementById("backButton") as HTMLButtonElement
-    const nextButton = document.getElementById("nextButton") as HTMLButtonElement
-
-    console.log(messageDates[index])
-    console.log(messageDates[index] > new Date())
-
-    if(checkDate()) {
-        nextButton.disabled = true
-        nextButton.style.backgroundColor = "grey"
-        return
-    }
-
-    if(index <= 0) {
-        changeColors(nextButton, backButton)
-    } else if (index >= messagesObjects.length-1 ) {
-        changeColors(backButton, nextButton)
-    } 
-    else {
-        backButton.disabled = false
-        nextButton.disabled = false
-        backButton.style.backgroundColor = "pink"
-        nextButton.style.backgroundColor = "pink"
-    }
-}
-
-function changeColors(onButton:HTMLButtonElement, offButton:HTMLButtonElement) {
-    offButton.disabled = true
-    offButton.style.backgroundColor = "grey"
-    onButton.disabled = false
-    onButton.style.backgroundColor = "pink"
-}
-
-
-function incrementStatements() {
-    index++
-    checkButtons()
-    if(index >= messagesObjects.length) {
-        index = messagesObjects.length-1
-        return
-    } 
-
-    setMessage()
-}
-
-function decrementStatements() {
-    index--
-    checkButtons()
-    if(index < 0) {
-        index = 0
-        return
-    } 
-    setMessage()
-}
-
-function setMessage() {
-
-    messageText = document.getElementById("statementArea");
-    date = document.getElementById("date");
-
-
-    console.log(checkDate())
-
-    if(checkDate()) {
-        if(messageText)
-            messageText.innerHTML = "You have to wait for tomorrow"
-
-        if(date) 
-            date.innerHTML = "Till Next Time"
-        return
-    }
-    
-    if(messageText)
-        messageText.innerHTML = messagesObjects[index].message
-
-    if(date) 
-        date.innerHTML = messagesObjects[index].date
-
-}
-
-interface message {
+interface Message {
     id: string;
     date: string;
     message: string;
 }
 
-let messagesObjects: message[] = []
-let messageDates: Date[] = []
+function MessageBox() {
+    const [index, setIndex] = useState(0);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [messageDates, setMessageDates] = useState<Date[]>([]);
+    const [buttonsDisabled, setButtonsDisabled] = useState({ next: false, back: false });
+    const messageTextRef = useRef<HTMLParagraphElement>(null);
+    const dateRef = useRef<HTMLHeadingElement>(null);
 
-let fetchInProgress = false;
+    useEffect(() => {
+        fetchDocuments();
+    }, []);
 
+    useEffect(() => {
+        if (messages.length > 0 && messageDates.length > 0) {
+            setFirstDay();
+            updateButtonStates();
+        }
+    }, [messages, messageDates]);
+
+    useEffect(() => {
+        updateButtonStates();
+        updateMessage();
+    }, [index]);
 
     const fetchDocuments = async () => {
-        console.log("Fetching documents...")
+        const fetchedMessages: Message[] = [];
+        const fetchedDates: Date[] = [];
 
-        // insurse only pushing one set of documents
-        if(fetchInProgress) return;
-        fetchInProgress = true
-
-        messagesObjects = []
-        messageDates = []
-
-        const snapshot = await getDocs(collection(db, "test-collection")) // using test collection rn --> switch to statements for production
+        const snapshot = await getDocs(collection(db, 'test-collection'));
         snapshot.forEach((doc) => {
-            const data = doc.data()
-
-            const messageObject: message = {
+            const data = doc.data();
+            fetchedMessages.push({
                 id: doc.id,
                 date: data.date.toDate().toLocaleDateString('en-US', {
-                    weekday: 'long', 
-                    day: '2-digit', 
+                    weekday: 'long',
+                    day: '2-digit',
                     month: 'short',
-                    year: 'numeric'
-                }).toString(),
+                    year: 'numeric',
+                }),
                 message: data.message,
-            }
+            });
+            fetchedDates.push(data.date.toDate());
+        });
 
-            messagesObjects.push(messageObject)
-            messageDates.push(data.date.toDate())
-        })
+        setMessages(fetchedMessages);
+        setMessageDates(fetchedDates);
+    };
 
-        console.log(messagesObjects)
-        
-        // set the <p> to the first day here because it will run only once --> or should...
-        setFirstDay()
-    }
-    
-    
-// }
+    const setFirstDay = () => {
+        let initialIndex = 0;
+        while (initialIndex < messageDates.length && messageDates[initialIndex] <= new Date()) {
+            initialIndex++;
+        }
+        initialIndex = Math.max(0, initialIndex - 1);
+        setIndex(initialIndex);
+    };
 
-export default MessageBox
+    const updateButtonStates = () => {
+        const today = new Date();
+        const isNextDisabled = index >= messages.length - 1 || messageDates[index] >= today;
+        const isBackDisabled = index <= 0;
+
+
+
+        setButtonsDisabled({ next: isNextDisabled, back: isBackDisabled });
+    };
+
+    const updateMessage = () => {
+        const today = new Date();
+
+        if (messageDates[index] >= today) {
+            if (messageTextRef.current) messageTextRef.current.textContent = 'You have to wait for tomorrow';
+            if (dateRef.current) dateRef.current.textContent = 'Till Next Time';
+            return;
+        }
+
+        if (messageTextRef.current) messageTextRef.current.textContent = messages[index]?.message || '';
+        if (dateRef.current) dateRef.current.textContent = messages[index]?.date || '';
+    };
+
+    const incrementStatements = () => {
+        if (index < messages.length - 1) {
+            setIndex(index + 1);
+        }
+    };
+
+    const decrementStatements = () => {
+        if (index > 0) {
+            setIndex(index - 1);
+        }
+    };
+
+    return (
+        <div>
+            <div className="message-box">
+                <h3 id="date" ref={dateRef}></h3>
+                <p id="statementArea" ref={messageTextRef}></p>
+            </div>
+            <div className="holdButtons">
+                <button 
+                    id="backButton" 
+                    onClick={decrementStatements} 
+                    disabled={buttonsDisabled.back}
+                    className={buttonsDisabled.back ? 'button-disabled' : 'button-enabled'}>
+                    Past Day
+                </button>
+                <button 
+                    id="nextButton" 
+                    onClick={incrementStatements} 
+                    disabled={buttonsDisabled.next}
+                    className={buttonsDisabled.next ? 'button-disabled' : 'button-enabled'}>
+                    Next Day
+                </button>
+            </div>
+        </div>
+    );
+}
+
+export default MessageBox;
