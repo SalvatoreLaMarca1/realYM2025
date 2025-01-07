@@ -6,7 +6,7 @@ function App() {
   return (
     <> 
       <div className="hold-all">
-        <h1>Yasmin Month!!!</h1>
+        <h1>Yasmin Month 2025</h1>
         <MessageBox/>
     </div>
     </>

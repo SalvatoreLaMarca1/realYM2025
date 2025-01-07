@@ -7,13 +7,24 @@
 }
 
 .button-disabled {
-    background-color: grey;
-    color: white;
+    /* background-color: #AA336A; */
+    transition: opacity .5s;
+    opacity: .7;
     cursor: not-allowed;
 }
 
 .button-enabled {
+    transition: opacity .5s;
+    opacity: 1;
+
     background-color: pink;
     color: black;
     cursor: pointer;
 }
+
+button:hover {
+    background-color: #AA336A;
+    border-color: #AA336A;
+    color: white;
+}
+
