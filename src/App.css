@@ -37,8 +37,10 @@
 @media (max-width: 480px) {
 
   .hold-all {
-    max-width: 300px;
+    width: 200px;
   }
+
+  
 }
 
 .card {
