@@ -33,6 +33,14 @@
   }
 }
 
+/* When this is on mobile --> Add to this... */ 
+@media (max-width: 480px) {
+
+  .hold-all {
+    max-width: 300px;
+  }
+}
+
 .card {
   padding: 2em;
 }
@@ -65,8 +73,8 @@
 }
 
 .message-box {
-  width: 500px;
-  height: 300px;
+  width: auto;
+  height: auto;
   background-color: pink;
   align-content: center;
   justify-content: center;
