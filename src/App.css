@@ -33,15 +33,9 @@
   }
 }
 
-/* When this is on mobile --> Add to this... */ 
-@media (max-width: 480px) {
 
-  .hold-all {
-    width: 200px;
-  }
 
-  
-}
+
 
 .card {
   padding: 2em;
@@ -52,13 +46,15 @@
 }
 
 
+
+
 .hold-all {
   margin:auto;
   justify-content: center;
   align-content: center;
   display: flex;
   flex-direction: column;
-  width: 500px;
+  width: auto;
   text-align: center;
 
   background-image: url('assets/topRight.png');
@@ -72,6 +68,34 @@
   padding-top: 150px;
   padding-bottom: 150px;
   box-shadow: 0 0 20px #AA336A; /* Adjust values as needed */
+}
+
+@media (max-width: 480px) {
+  .hold-all {
+    /* margin:auto; */
+    justify-content: center;
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    text-align: center;
+    padding: 20px;
+
+    background-image: url('assets/topRight.png');
+    background-size: 250px;
+    background-position: center;
+
+    border-radius: 15px;
+    box-shadow: 0 0 20px #AA336A; /* Adjust values as needed */
+  }
+
+  button {
+    font-size: small;
+  }
+
+  h1 {
+    font-size: 1rem;
+  }
 }
 
 .message-box {
@@ -88,7 +112,7 @@
 
 h1 {
   color: black;
-  size: 2px;
+  font-size: 3rem;
   background-color: pink;
   border-radius: 15px;
 }

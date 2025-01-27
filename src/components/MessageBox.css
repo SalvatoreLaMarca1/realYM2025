@@ -1,3 +1,33 @@
+
+/* @media (max-width: 480px) {
+
+    button {
+        max-width:100px;
+        max-height: 50px;
+        font-size: small;
+    }
+
+    .hold-all {
+        max-width: 10px;
+    }
+    body {
+        background-color: green;
+    }
+    
+    h1 {
+        font-size: 30px;
+    }
+      
+    .message-box {
+        max-width: 10px;
+    }
+
+    .message-block {
+        width: 10px;
+        background-color: blue;
+    }
+} */
+
 .holdButtons {
     padding: 10px;
     background-color: transparent;

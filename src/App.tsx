@@ -4,12 +4,11 @@ import MessageBox from './components/MessageBox'
 function App() {
 
   return (
-    <> 
+
       <div className="hold-all">
         <h1>Yasmin Month 2025</h1>
         <MessageBox/>
-    </div>
-    </>
+      </div>
   )
 }
 

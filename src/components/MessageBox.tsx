@@ -103,7 +103,7 @@ function MessageBox() {
     };
 
     return (
-        <div>
+        <div className="message-block">
             <div className="message-box">
                 <h3 id="date" ref={dateRef}></h3>
                 <p id="statementArea" ref={messageTextRef}></p>
