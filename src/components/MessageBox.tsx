@@ -38,7 +38,7 @@ function MessageBox() {
         const fetchedMessages: Message[] = [];
         const fetchedDates: Date[] = [];
 
-        const snapshot = await getDocs(collection(db, 'test-collection'));
+        const snapshot = await getDocs(collection(db, 'test-collection')); // test-collection
         snapshot.forEach((doc) => {
             const data = doc.data();
             fetchedMessages.push({
