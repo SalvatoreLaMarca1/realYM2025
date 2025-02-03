@@ -18,6 +18,7 @@ function MessageBox() {
     const messageTextRef = useRef<HTMLParagraphElement>(null);
     const dateRef = useRef<HTMLHeadingElement>(null);
 
+
     useEffect(() => {
         fetchDocuments();
     }, []);
@@ -25,7 +26,6 @@ function MessageBox() {
     useEffect(() => {
         if (messages.length > 0 && messageDates.length > 0) {
             setFirstDay();
-            updateButtonStates();
         }
     }, [messages, messageDates]);
 
@@ -35,6 +35,7 @@ function MessageBox() {
     }, [index]);
 
     const fetchDocuments = async () => {
+        
         const fetchedMessages: Message[] = [];
         const fetchedDates: Date[] = [];
 
@@ -52,6 +53,8 @@ function MessageBox() {
                 message: data.message,
             });
             fetchedDates.push(data.date.toDate());
+
+        
         });
 
         setMessages(fetchedMessages);
@@ -59,19 +62,21 @@ function MessageBox() {
     };
 
     const setFirstDay = () => {
-        let initialIndex = 0;
-        while (initialIndex < messageDates.length && messageDates[initialIndex] <= new Date()) {
-            initialIndex++;
+
+        let index = 0;
+        
+        while(index < messageDates.length && messageDates[index] < new Date()) {
+            index++
         }
-        initialIndex = Math.max(0, initialIndex - 1);
-        setIndex(initialIndex);
+        index--;
+        setIndex(index)
+        updateButtonStates()
     };
 
     const updateButtonStates = () => {
         const today = new Date();
-        const isNextDisabled = index >= messages.length - 1 || messageDates[index] >= today;
+        const isNextDisabled = index >= messages.length - 1 || messageDates[index] > today;
         const isBackDisabled = index <= 0;
-
 
 
         setButtonsDisabled({ next: isNextDisabled, back: isBackDisabled });
@@ -80,7 +85,8 @@ function MessageBox() {
     const updateMessage = () => {
         const today = new Date();
 
-        if (messageDates[index] >= today) {
+
+        if (messageDates[index] > today) {
             if (messageTextRef.current) messageTextRef.current.textContent = 'You have to wait for tomorrow';
             if (dateRef.current) dateRef.current.textContent = 'Till Next Time';
             return;
